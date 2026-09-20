@@ -4,9 +4,9 @@ An Arduino-based radar prototype that scans a defined angular range using an **H
 
 ## Project Overview
 
-The system scans from **15° to 165°** and back. At each servo position, the HC-SR04 measures the distance to an object.
+The system performs a full **0° to 180° sweep** and then returns from **180° to 0°**. At each servo position, the HC-SR04 measures the distance to an object. The Processing visualization represents the complete 0°–180° scanning range.
 
-- Scan range: **15°–165°**
+- Scan range: **0°–180°**
 - Scan step: **2°**
 - Warning threshold: **20 cm**
 - Serial communication: **9600 baud**
@@ -113,6 +113,10 @@ Arduino-Based-Radar-System-for-Object-Detection/
 │   └── README.md
 └── README.md
 ```
+
+## Scan and Visualization
+
+The SG90 servo is controlled across its full **0°–180° range**, and the Processing interface is configured to visualize the corresponding 0°–180° radar sweep. This gives the prototype a full angular scanning field rather than limiting the scan to a smaller central range.
 
 ## Project Status
 
