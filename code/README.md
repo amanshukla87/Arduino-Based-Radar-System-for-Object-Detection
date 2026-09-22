@@ -13,10 +13,34 @@ Arduino firmware that:
 - Activates LEDs and buzzer according to the 20 cm warning threshold.
 - Sends angle and distance over serial at **9600 baud**.
 
-Serial format:
+### Hardware Interface
+
+| Component | Arduino Uno Pin |
+|---|---|
+| Green LED | D2 |
+| Red LED | D3 |
+| Piezo buzzer | D8 |
+| SG90 servo signal | D9 |
+| HC-SR04 Trig | D10 |
+| HC-SR04 Echo | D11 |
+| Potentiometer wiper | A0 |
+| LCD SDA | SDA / A4 |
+| LCD SCL | SCL / A5 |
+
+The LCD uses the I2C interface. The HC-SR04 and servo are powered from the breadboard 5V and GND rails.
+
+### Serial Format
+
+The Arduino sends each measurement in the following format:
 
 ```text
 angle,distance.
+```
+
+For example:
+
+```text
+90,18.
 ```
 
 ### `radar_visualization.pde`
