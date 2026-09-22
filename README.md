@@ -63,6 +63,12 @@ The current firmware initializes the LCD at I2C address **0x27**.
 - **Processing** — Used to receive the Arduino serial data and render the radar visualization. [Processing official documentation](https://processing.org/reference/)
 - **Serial communication** — Transfers the current scan angle and measured distance from the Arduino to the Processing application at **9600 baud**.
 
+## Circuit Diagram
+
+![Radar Circuit Diagram](./circuit/circuitradar_circuit_diagram.png)
+
+The circuit diagram shows the Arduino UNO connections to the HC-SR04 ultrasonic sensor, SG90 servo, 16×2 I2C LCD, LEDs, buzzer, and potentiometer used in the prototype.
+
 ## How It Works
 
 ```text
