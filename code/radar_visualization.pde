@@ -1,6 +1,4 @@
 import processing.serial.*;
-import java.awt.event.KeyEvent;
-import java.io.IOException;
 
 Serial myPort;
 
@@ -12,26 +10,22 @@ float pixsDistance;
 int iAngle, iDistance;
 int index1 = 0;
 
+final String SERIAL_PORT = "COM3";
+final int BAUD_RATE = 9600;
+final int WARNING_DISTANCE_CM = 20;
+
 void setup() {
-  size(1200, 700); // Window resolution
+  size(1200, 700);
   smooth();
-  
-  // Explicitly locked to COM3
-  String portName = "COM3";
-  myPort = new Serial(this, portName, 9600);
-  myPort.bufferUntil('.'); // Read data stream up to the '.' character
+
+  myPort = new Serial(this, SERIAL_PORT, BAUD_RATE);
+  myPort.bufferUntil('.');
 }
 
 void draw() {
-  fill(98, 245, 31); // Green radar glow color
-  
-  // Simulates motion blur sweep
   fill(0, 4);
   rect(0, 0, width, height - height * 0.065);
-  
-  fill(98, 245, 31);
-  
-  // Radar Drawing Functions
+
   drawRadar();
   drawLine();
   drawObject();
@@ -40,13 +34,15 @@ void draw() {
 
 void serialEvent(Serial myPort) {
   data = myPort.readStringUntil('.');
+
   if (data != null) {
     data = data.substring(0, data.length() - 1);
     index1 = data.indexOf(",");
+
     if (index1 > 0) {
       angle = data.substring(0, index1);
-      distance = data.substring(index1 + 1, data.length());
-      
+      distance = data.substring(index1 + 1);
+
       iAngle = int(angle);
       iDistance = int(distance);
     }
@@ -59,13 +55,13 @@ void drawRadar() {
   noFill();
   strokeWeight(2);
   stroke(98, 245, 31);
-  
+
   // Radial grid arcs
-  arc(0, 0, (width - width * 0.0625), (width - width * 0.0625), PI, TWO_PI);
-  arc(0, 0, (width - width * 0.27), (width - width * 0.27), PI, TWO_PI);
-  arc(0, 0, (width - width * 0.479), (width - width * 0.479), PI, TWO_PI);
-  arc(0, 0, (width - width * 0.687), (width - width * 0.687), PI, TWO_PI);
-  
+  arc(0, 0, width - width * 0.0625, width - width * 0.0625, PI, TWO_PI);
+  arc(0, 0, width - width * 0.27, width - width * 0.27, PI, TWO_PI);
+  arc(0, 0, width - width * 0.479, width - width * 0.479, PI, TWO_PI);
+  arc(0, 0, width - width * 0.687, width - width * 0.687, PI, TWO_PI);
+
   // Angle lines
   line(-width/2, 0, width/2, 0);
   line(0, 0, (-width/2) * cos(radians(30)), (-width/2) * sin(radians(30)));
@@ -80,12 +76,14 @@ void drawObject() {
   pushMatrix();
   translate(width/2, height - height * 0.074);
   strokeWeight(9);
-  stroke(255, 10, 10); // Red detection line
-  
+  stroke(255, 10, 10);
+
   pixsDistance = iDistance * ((height - height * 0.1666) * 0.025);
-  if (iDistance < 40) {
+
+  if (iDistance <= WARNING_DISTANCE_CM) {
     line(pixsDistance * cos(radians(iAngle)), -pixsDistance * sin(radians(iAngle)),
-         (width/2 - width * 0.05) * cos(radians(iAngle)), -(width/2 - width * 0.05) * sin(radians(iAngle)));
+         (width/2 - width * 0.05) * cos(radians(iAngle)),
+         -(width/2 - width * 0.05) * sin(radians(iAngle)));
   }
   popMatrix();
 }
@@ -93,34 +91,39 @@ void drawObject() {
 void drawLine() {
   pushMatrix();
   strokeWeight(9);
-  stroke(30, 250, 60); // Green sweep line
+  stroke(30, 250, 60);
   translate(width/2, height - height * 0.074);
-  line(0, 0, (height - height * 0.12) * cos(radians(iAngle)), -(height - height * 0.12) * sin(radians(iAngle)));
+  line(0, 0,
+       (height - height * 0.12) * cos(radians(iAngle)),
+       -(height - height * 0.12) * sin(radians(iAngle)));
   popMatrix();
 }
 
 void drawText() {
   pushMatrix();
-  if (iDistance > 40) {
-    noObject = "Out of Range";
-  } else {
+
+  if (iDistance <= WARNING_DISTANCE_CM) {
     noObject = "In Range";
+  } else {
+    noObject = "Out of Range";
   }
-  
+
   fill(0, 0, 0);
   noStroke();
   rect(0, height - height * 0.0648, width, height);
+
   fill(98, 245, 31);
   textSize(25);
-  
+
   text("10cm", width - width * 0.3854, height - height * 0.0833);
   text("20cm", width - width * 0.281, height - height * 0.0833);
   text("30cm", width - width * 0.177, height - height * 0.0833);
   text("40cm", width - width * 0.0729, height - height * 0.0833);
-  
+
   textSize(40);
   text("Object: " + noObject, width - width * 0.875, height - height * 0.0277);
   text("Angle: " + iAngle + "°", width - width * 0.48, height - height * 0.0277);
   text("Distance: " + iDistance + " cm", width - width * 0.26, height - height * 0.0277);
+
   popMatrix();
 }
