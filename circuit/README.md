@@ -2,6 +2,12 @@
 
 Hardware connection details for the **Arduino Based Radar System for Object Detection**.
 
+## Circuit Diagram
+
+The circuit diagram shows the Arduino UNO connections to the HC-SR04 ultrasonic sensor, SG90 servo, 16×2 I2C LCD, LEDs, buzzer, and potentiometer used in the prototype.
+
+![Radar Circuit Diagram](./circuitradar_circuit_diagram.png)
+
 ## Pin Mapping
 
 | Arduino UNO | Module / Component | Connection |
