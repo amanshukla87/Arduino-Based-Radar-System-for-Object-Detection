@@ -69,23 +69,45 @@ The current firmware initializes the LCD at I2C address **0x27**.
 
 The circuit diagram shows the Arduino UNO connections to the HC-SR04 ultrasonic sensor, SG90 servo, 16×2 I2C LCD, LEDs, buzzer, and potentiometer used in the prototype.
 
+## System Architecture
+
+The radar prototype follows a simple embedded sensing and visualization path, with the Arduino UNO coordinating ultrasonic measurement, servo scanning, local indication, and serial communication.
+
+```mermaid
+flowchart TB
+    ARDUINO["Arduino UNO"]
+
+    SERVO["SG90 Servo<br/>Angular Scanning"]
+    SENSOR["HC-SR04<br/>Distance Measurement"]
+
+    PROCESS["Angle + Distance<br/>Processing"]
+
+    LCD["16×2 I2C LCD<br/>Status Display"]
+    ALERT["LEDs + Buzzer<br/>Local Warning"]
+    SERIAL["Serial Communication"]
+    PC["Computer"]
+    VISUAL["Processing<br/>Radar Visualization"]
+
+    ARDUINO --> SERVO
+    SERVO --> SENSOR
+    SENSOR --> PROCESS
+    PROCESS --> LCD
+    PROCESS --> ALERT
+    PROCESS --> SERIAL
+    SERIAL --> PC
+    PC --> VISUAL
+```
+
+The architecture represents the completed prototype workflow from servo-based ultrasonic scanning to local status indication and computer-side radar visualization.
+
 ## How It Works
 
-```text
-SG90 Servo rotates HC-SR04
-          ↓
-HC-SR04 measures distance
-          ↓
-Arduino UNO processes angle + distance
-          ↓
-     ┌────┴─────────────┐
-     ↓                  ↓
-LCD + LEDs + Buzzer   Serial Data
-                         ↓
-                    Processing
-                         ↓
-                 Radar Visualization
-```
+1. The **SG90 servo** rotates the HC-SR04 through the configured 0°–180° scan range.
+2. The **HC-SR04** measures the distance to objects at each scan position.
+3. The **Arduino UNO** associates the measured distance with the current servo angle.
+4. The **LCD, LEDs, and buzzer** provide local status and warning indication.
+5. The measured angle and distance are transmitted over serial communication.
+6. **Processing** receives the serial data and renders the radar visualization.
 
 ## Code
 
