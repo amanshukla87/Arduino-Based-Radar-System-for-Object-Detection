@@ -1,60 +1,91 @@
-# Circuit
+# Circuit Diagram & Hardware Connections
 
-Hardware connection details for the **Arduino Based Radar System for Object Detection**.
+This folder contains the circuit diagram and verified hardware connection details for the **Arduino Based Radar System for Object Detection**.
 
 ## Circuit Diagram
 
-The circuit diagram shows the Arduino UNO connections to the HC-SR04 ultrasonic sensor, SG90 servo, 16×2 I2C LCD, LEDs, buzzer, and potentiometer used in the prototype.
-
 ![Radar Circuit Diagram](./circuitradar_circuit_diagram.png)
 
-## Pin Mapping
+> **Connection note:** The pin mapping below follows the current Arduino firmware in `code/radar_system.ino` and the physical project setup.
 
-| Arduino UNO | Module / Component | Connection |
+## Verified Arduino UNO Pin Mapping
+
+| Arduino UNO Pin | Component | Connection / Function |
 |---|---|---|
-| D2 | Green LED | Anode / control |
-| D3 | Red LED | Anode / control |
-| D8 | Piezo buzzer | Positive / control |
-| D9 | SG90 servo | Signal |
-| D10 | HC-SR04 | TRIG |
-| D11 | HC-SR04 | ECHO |
-| A0 | Potentiometer | Wiper |
-| A4 / SDA | 16x2 I2C LCD | SDA |
-| A5 / SCL | 16x2 I2C LCD | SCL |
-| 5V | HC-SR04, servo, LCD | Supply |
-| GND | Modules and indicators | Common ground |
+| **D2** | Green LED | LED control through current-limiting resistor |
+| **D3** | Red LED | LED control through current-limiting resistor |
+| **D8** | Buzzer | Buzzer control |
+| **D9** | SG90 Servo | Signal / control |
+| **D10** | HC-SR04 | TRIG |
+| **D11** | HC-SR04 | ECHO |
+| **A4 / SDA** | 16×2 I2C LCD | I2C data |
+| **A5 / SCL** | 16×2 I2C LCD | I2C clock |
+| **5V** | HC-SR04, LCD, Servo supply | VCC / supply |
+| **GND** | All modules and indicators | Common ground |
 
-The LEDs are connected to ground through resistors. The potentiometer is connected across 5V and GND, with its wiper connected to A0.
+## 16×2 I2C LCD
 
-The Arduino UNO R3 provides A4/SDA and A5/SCL for I2C communication.
+- LCD type: **16×2 I2C**
+- I2C address: **`0x27`**
+- SDA: **A4 / SDA**
+- SCL: **A5 / SCL**
+- Powered from Arduino **5V and GND**.
 
-## I2C LCD
+## Potentiometer
 
-The current firmware initializes the LCD as a 16-column × 2-row display at I2C address `0x27`.
+The potentiometer visible in the physical setup is used for **LCD contrast adjustment**. It is part of the LCD hardware connection and is **not connected to A0 for measurement by the Arduino firmware**.
 
-## Object Warning
+Therefore, **A0 is not a project sensor/input pin in the current code**.
 
-The firmware uses a **20 cm** distance threshold.
+## Power & Ground
 
-When an object is detected within the warning range:
-- Red LED: ON
-- Green LED: OFF
-- Buzzer: ON
-- LCD: Shows distance and warning status
+- **HC-SR04:** VCC → 5V, GND → GND
+- **SG90 servo:** VCC → 5V, GND → GND, signal → D9
+- **16×2 I2C LCD:** VCC → 5V, GND → GND, SDA → A4, SCL → A5
+- **Green and red LEDs:** controlled from D2 and D3 through current-limiting resistors
+- **Buzzer:** controlled from D8
+- All modules share a **common Arduino GND**.
 
-For distances above the threshold, the green LED is enabled and the system reports a clear condition.
+## Object Detection & Alert Logic
+
+The firmware uses a **20 cm warning threshold**:
+
+| Condition | Green LED | Red LED | Buzzer | LCD |
+|---|---:|---:|---:|---|
+| Distance ≤ 20 cm | OFF | ON | ON | Object distance + `WARN!` |
+| Distance > 20 cm | ON | OFF | OFF | `Status: CLEAR` |
+
+## Radar Scanning
+
+- Servo scan range: **0° to 180°**
+- Scan step: **2°**
+- HC-SR04 measures distance at each servo position
+- Serial output: **9600 baud**
+- Serial data format: `angle,distance.`
+- Processing visualization reads the same serial data to display the radar interface.
 
 ## Hardware Flow
 
 ```text
-Arduino UNO
-   │
-   ├── HC-SR04 → Distance measurement
-   ├── SG90 servo → Angular scanning
-   ├── 16x2 I2C LCD → Status display
-   ├── LEDs → Visual indication
-   ├── Piezo buzzer → Audible warning
-   └── Potentiometer → Analog input
+                    ┌─────────────────────┐
+                    │     Arduino UNO     │
+                    └──────────┬──────────┘
+                               │
+       ┌───────────────────────┼────────────────────────┐
+       │                       │                        │
+       ▼                       ▼                        ▼
+  HC-SR04 + SG90          16×2 I2C LCD          Alert Outputs
+  D10 → TRIG              A4 → SDA             D2 → Green LED
+  D11 → ECHO              A5 → SCL             D3 → Red LED
+  D9  → Servo             0x27                 D8 → Buzzer
+       │                       │
+       └─────────────── 5V / GND ─────────────┘
 ```
 
-The assembled hardware is shown in [Setup Image](../setup-image/README.md).
+## Source & Related Documentation
+
+- Arduino firmware: [`../code/radar_system.ino`](../code/radar_system.ino)
+- Processing visualization: [`../code/radar_visualization.pde`](../code/radar_visualization.pde)
+- Physical setup: [`../setup-image/README.md`](../setup-image/README.md)
+
+> **Important:** The current firmware does not configure or read `A0`. The earlier circuit documentation showing the potentiometer wiper connected to A0 has therefore been removed.
