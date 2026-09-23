@@ -2,6 +2,13 @@
 
 Project documentation for the **Arduino Based Radar System for Object Detection**.
 
+## Project Report
+
+![Radar Project Report Cover](./radar-project-cover.png)
+
+*Project report cover — Government Polytechnic Saharanpur, 2021–2022.*
+
+
 ## Project Scope
 
 This project is a working Arduino-based prototype for ultrasonic object detection with angular scanning. The documentation covers the hardware setup, circuit connections, Arduino firmware, Processing visualization, and observed system behavior.
