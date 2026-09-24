@@ -1,170 +1,170 @@
 # Arduino Based Radar System for Object Detection
 
-A diploma final-year embedded-systems project developed using **Arduino UNO, HC-SR04 ultrasonic sensor, and SG90 servo motor** to detect objects across a 0°–180° scanning range and visualize their position through a computer-based radar interface.
+An Arduino-based radar prototype built during my **Diploma in Electronics Engineering** to understand ultrasonic sensing, servo control, embedded programming, and serial visualization.
+
+The idea is simple: rotate an **HC-SR04 ultrasonic sensor** with an **SG90 servo**, measure the distance at different angles, and send the readings to a computer where **Processing** displays them as a radar-style interface.
+
+## Project Highlights
+
+- **Arduino UNO** as the main controller
+- **HC-SR04** for ultrasonic distance measurement
+- **SG90** for 0°–180° scanning
+- **16×2 I2C LCD** for local status
+- **Green LED, red LED and buzzer** for object indication
+- **Processing** for computer-based radar visualization
+- Serial communication at **9600 baud**
+- Warning threshold set to **20 cm**
 
 ## Project Achievement
 
-🏆 **2nd Rank — Technical Project Exhibition**
+🏅 **Silver Medal — Institutional Project Exhibition**
 
-This project was selected and presented at a **Technical Project Exhibition** during my Diploma final year, where it **secured 2nd rank** and received a **trophy and medal** in recognition of the project work.
+This was my **Diploma final-year project** and one of my early hands-on projects in embedded systems. It gave me practical experience with Arduino programming, sensors, motors, display interfacing, and debugging a complete hardware setup.
 
-**Author:** Aman Shukla  
-**Project Level:** Diploma Final Year  
-**Project Type:** Embedded Systems / Arduino / Object Detection
+## How It Works
 
-## Project Overview
+The SG90 servo moves the HC-SR04 between **0° and 180° in 2° steps**.
 
-The system works as a small-scale radar prototype. An **HC-SR04 ultrasonic sensor** is mounted on an **SG90 servo motor** and rotated through a **0°–180°** scanning range. At each angular position, the sensor measures the distance to an object.
+At every position:
 
-The Arduino UNO processes the angle and distance data and:
+1. The servo moves to the required angle.
+2. The HC-SR04 sends an ultrasonic pulse and measures the return time.
+3. The Arduino converts that measurement into distance.
+4. The angle and distance are shown on the LCD and sent over serial.
+5. If an object is **20 cm or closer**, the red LED and buzzer turn on.
+6. Otherwise, the green LED indicates a clear condition.
+7. Processing reads the serial data and draws the radar sweep.
 
-- Displays the current angle and object status on a **16×2 I2C LCD**
-- Uses a **green LED** for a clear condition
-- Uses a **red LED and buzzer** when an object is detected within the warning threshold
-- Sends angle and distance data to a computer through **serial communication**
-- Uses **Processing** to display the data as a radar-style visualization
+The Arduino sends data in this format:
 
-### Key Specifications
+```text
+angle,distance.
+```
 
-| Parameter | Value |
-|---|---|
-| Scan Range | **0°–180°** |
-| Scan Step | **2°** |
-| Object Warning Threshold | **20 cm** |
-| Serial Baud Rate | **9600 baud** |
-| Distance Sensor | **HC-SR04** |
-| Servo Motor | **SG90** |
-| Controller | **Arduino UNO** |
-| Computer Visualization | **Processing** |
+Example:
 
-## Hardware Used
+```text
+90,18.
+```
+
+## Hardware
 
 | Component | Purpose |
 |---|---|
 | **Arduino UNO** | Main controller |
-| **HC-SR04 Ultrasonic Sensor** | Object distance measurement |
-| **SG90 Servo Motor** | Rotates the ultrasonic sensor |
-| **16×2 I2C LCD** | Displays angle, distance, and status |
+| **HC-SR04** | Distance measurement |
+| **SG90 Servo** | Rotates the ultrasonic sensor |
+| **16×2 I2C LCD** | Displays angle and status |
+| **Green LED** | Clear condition |
+| **Red LED** | Object warning |
+| **Buzzer** | Audible warning |
 | **Potentiometer** | LCD contrast adjustment |
-| **Green LED** | Clear/no-warning indication |
-| **Red LED** | Object warning indication |
-| **Buzzer** | Audible object warning |
-| **Jumper Wires (M-M, M-F, F-F)** | Circuit connections |
+| **Jumper Wires** | Hardware connections |
 
-## Project Demonstration
+## Arduino Pin Mapping
+
+The table below follows the current firmware in `code/radar_system.ino`.
+
+| Arduino UNO | Connected Component | Function |
+|---|---|---|
+| **D2** | Green LED | Clear indication |
+| **D3** | Red LED | Warning indication |
+| **D8** | Buzzer | Warning output |
+| **D9** | SG90 Servo | Servo control signal |
+| **D10** | HC-SR04 | TRIG |
+| **D11** | HC-SR04 | ECHO |
+| **A4 / SDA** | 16×2 I2C LCD | I2C data |
+| **A5 / SCL** | 16×2 I2C LCD | I2C clock |
+
+The LCD uses I2C address **`0x27`**.
+
+The potentiometer is part of the LCD contrast circuit and is **not read by the Arduino firmware as an analog input**.
+
+## Hardware Setup
 
 ![Radar Project Setup](./setup-image/1780160873743.jpg)
 
-The physical prototype demonstrates the Arduino-based sensing system, servo-mounted ultrasonic sensor, LCD display, and local warning indicators.
-
-## Project Documentation
-
-![Radar Project](./document/radar-project-cover.png)
-
-The project documentation contains the project presentation and supporting material from the diploma final-year project work.
+This is the physical prototype used during the project. The setup includes the Arduino UNO, servo-mounted HC-SR04, LCD, LEDs, buzzer, potentiometer, breadboard, and jumper-wire connections.
 
 ## Circuit Diagram
 
 ![Radar Circuit Diagram](./circuit/circuitradar_circuit_diagram.png)
 
-The circuit connects the Arduino UNO with the HC-SR04 ultrasonic sensor, SG90 servo, 16×2 I2C LCD, LEDs, buzzer, and supporting components.
+The circuit connects the Arduino with the ultrasonic sensor, servo, LCD, LEDs, and buzzer.
 
-## Pin Mapping
+More connection details are available in the [circuit documentation](./circuit/README.md).
 
-| Arduino Pin | Component | Function |
-|---|---|---|
-| **D8** | Buzzer | Warning output |
-| **D9** | HC-SR04 TRIG | Ultrasonic trigger |
-| **D10** | HC-SR04 ECHO | Ultrasonic echo input |
-| **D11** | SG90 Servo | Servo control signal |
-| **D12** | Green LED | Clear indication |
-| **D13** | Red LED | Warning indication |
-| **A4** | 16×2 I2C LCD | SDA |
-| **A5** | 16×2 I2C LCD | SCL |
+## Radar Visualization
 
-The LCD is configured at I2C address **0x27**.
+The Processing sketch receives the Arduino data and displays:
 
-> The potentiometer is used for physical LCD contrast adjustment and is not controlled by the Arduino firmware.
+- Radar sweep
+- Current angle
+- Measured distance
+- Object status
+- Object position when it is within the warning range
 
-## Software and Technologies
+The current Processing sketch is configured for **COM3 at 9600 baud**. Change the serial-port value in `code/radar_visualization.pde` if the Arduino appears on a different port.
 
-### Arduino Firmware
-
-- **C/C++**
-- **Arduino IDE**
-- **Arduino UNO**
-- **Servo library**
-- **Wire library**
-- **LiquidCrystal_I2C library**
-
-### Computer Visualization
-
-- **Processing**
-- **Java / Processing Java Mode**
-- **Serial Communication**
-
-## System Architecture
-
-```mermaid
-flowchart LR
-    A["Arduino UNO"] --> B["SG90 Servo"]
-    B --> C["HC-SR04"]
-    C --> D["Distance Measurement"]
-    D --> A
-
-    A --> E["16×2 I2C LCD"]
-    A --> F["Green LED"]
-    A --> G["Red LED + Buzzer"]
-
-    A -->|"Angle + Distance<br/>9600 baud"| H["Computer"]
-    H --> I["Processing<br/>Radar Visualization"]
-```
-
-## How It Works
-
-1. The **Arduino UNO** commands the SG90 servo to move through the 0°–180° scan range.
-2. The **HC-SR04** measures the distance to an object at each servo position.
-3. The Arduino associates the measured distance with the current servo angle.
-4. The current angle, distance, and status are displayed on the **16×2 I2C LCD**.
-5. If an object is detected within **20 cm**, the red LED and buzzer provide a warning.
-6. The Arduino transmits the angle and distance through serial communication at **9600 baud**.
-7. The **Processing** application receives the data and displays the radar sweep and detected object position.
-
-## Source Code
+## Software
 
 ### Arduino
 
-`code/radar_system.ino`
-
-Contains the Arduino firmware for:
-
-- Servo control
-- HC-SR04 distance measurement
-- LCD display
-- LED indication
-- Buzzer warning
-- Serial data transmission
+- C/C++
+- Arduino IDE
+- Servo library
+- Wire library
+- LiquidCrystal_I2C library
 
 ### Processing
 
-`code/radar_visualization.pde`
+- Processing
+- Processing Java Mode
+- Serial communication
 
-Contains the Processing visualization for:
+## System Flow
 
-- Receiving serial angle and distance data
-- Rendering the radar sweep
-- Displaying detected object position
+```text
+HC-SR04
+   │
+   ▼
+Arduino UNO ──► LCD
+   │
+   ├──► Green LED / Red LED / Buzzer
+   │
+   └──► Serial: angle,distance.
+                    │
+                    ▼
+                Processing
+                    │
+                    ▼
+             Radar Visualization
+```
 
-## Running the Project
+## Source Code
 
-1. Connect the hardware according to the pin mapping and circuit diagram.
-2. Open `code/radar_system.ino` in **Arduino IDE**.
-3. Upload the firmware to the Arduino UNO.
-4. Open the Serial Monitor and verify communication at **9600 baud**.
-5. Open `code/radar_visualization.pde` in **Processing**.
-6. Select the correct Arduino serial port in the Processing sketch.
-7. Run the Processing sketch.
-8. Place an object within the sensing area and observe the radar visualization and local indicators.
+### Arduino Firmware
+
+[`code/radar_system.ino`](./code/radar_system.ino)
+
+Handles:
+
+- Servo scanning
+- HC-SR04 distance measurement
+- LCD output
+- LED and buzzer control
+- Serial data transmission
+
+### Processing Visualization
+
+[`code/radar_visualization.pde`](./code/radar_visualization.pde)
+
+Handles:
+
+- Serial data reception
+- Radar graphics
+- Angle and distance display
+- Object warning visualization
 
 ## Project Structure
 
@@ -188,31 +188,35 @@ Arduino-Based-Radar-System-for-Object-Detection/
 └── README.md
 ```
 
+## What I Learned
+
+This project was one of my first complete hardware-software systems. More than just making the radar display work, it helped me understand how individual parts of an embedded system come together:
+
+- Reading sensors from a microcontroller
+- Controlling a servo motor
+- Working with I2C displays
+- Using digital outputs for alerts
+- Sending structured data over serial
+- Connecting embedded hardware with a PC visualization
+- Debugging hardware and software together
+
 ## Project Status
 
 **Completed — Diploma Final-Year Project**
 
-This project demonstrates practical implementation of:
+The repository contains the implemented Arduino firmware, Processing visualization, circuit documentation, and hardware setup used for the project.
 
-- Embedded C/C++ programming
-- Arduino microcontroller interfacing
-- Ultrasonic distance measurement
-- Servo motor control
-- I2C LCD interfacing
-- LED and buzzer control
-- Serial communication
-- Computer-based visualization using Processing
+## Documentation
 
-## Achievement
-
-### 🏆 2nd Rank — Technical Project Exhibition
-
-The project was selected for a **Technical Project Exhibition** during my Diploma final year and **secured 2nd rank**, for which I received a **trophy and medal**.
-
-This project was an important part of my early hands-on experience in embedded systems, sensor interfacing, and hardware-software integration.
+- [Circuit & Pin Mapping](./circuit/README.md)
+- [Code Documentation](./code/README.md)
+- [Hardware Setup](./setup-image/README.md)
+- [Project Documentation](./document/README.md)
 
 ## Author
 
-**Aman Shukla**  
+**Aman Shukla**
+
 Diploma in Electronics Engineering  
-Government Polytechnic, Saharanpur
+Government Polytechnic Saharanpur
+
